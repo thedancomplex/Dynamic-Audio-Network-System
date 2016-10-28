@@ -11,6 +11,7 @@ Servo myservo2;  // create servo object to control a servo
 Servo myservo3;  // create servo object to control a servo
 Servo myservo4;  // create servo object to control a servo
 Servo myservo5;  // create servo object to control a servo
+Servo myservoDamp;  // create servo object to control a servo
 
 int low0 = 80; // desired edge of servo (0 - 180)
 int high0 = 70; // other desired edge of servo (0 - 180)
@@ -24,6 +25,10 @@ int low4 = 90; // desired edge of servo (0 - 180)
 int high4 = 80; // other desired edge of servo (0 - 180)
 int low5 = 86; // desired edge of servo (0 - 180)
 int high5 = 76; // other desired edge of servo (0 - 180)
+
+int highDamp = 95;
+int lowDamp = highDamp - 10;;
+
   
 
 void setup() {
@@ -49,6 +54,9 @@ void setup() {
 
   myservo5.attach(11);  // attaches the servo on pin 9 to the servo object
   myservo5.write(low5); //initial value for servo angle
+
+  myservoDamp.attach(13);  // attaches the servo on pin 9 to the servo object
+  myservoDamp.write(lowDamp); //initial value for servo angle
 }
 
 void loop() {
@@ -68,7 +76,8 @@ void loop() {
 //  int low = 90; // desired edge of servo (0 - 180)
 //  int high = 80; // other desired edge of servo (0 - 180)
 
-  int servoDelay = 50; //desired delay between servo rotation
+  int servoDelay = 40; //desired delay between servo rotation
+  int servoDampDelay = 10; // delay for damping servo
 
   
   if (Serial1.available() > 0) 
@@ -99,6 +108,10 @@ void loop() {
 
             int val = map(note2*4, 0, 1023, 0, 180);     // scale it to use it with the servo (value between 0 and 180)
             //myservo.write(val);                  // sets the servo position according to the scaled value
+
+            // pull damper up
+                myservoDamp.write(highDamp);
+                delay(servoDampDelay);
             
             if (note2 == 0x40){  // C flat played
                 myservo0.write(low0);
@@ -147,6 +160,10 @@ void loop() {
                 delay(servoDelay);
                 myservo5.write(low5);    
             }
+
+            // pull damper down
+            myservoDamp.write(lowDamp);
+            
             
             while(Serial1.available()){  // Flush all remaining notes in queue 
               Serial1.read();
